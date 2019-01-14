@@ -20,7 +20,7 @@ def rsvd(A, rank, n_oversamples=None, n_subspace_iters=None, return_range=False)
     :return:                 U, S, and Vt as in truncated SVD.
     """
     if n_oversamples is None:
-        # This is the default in the presented algorithm.
+        # This is the default used in the paper.
         n_samples = 2 * rank
     else:
         n_samples = rank + n_oversamples
@@ -46,8 +46,8 @@ def rsvd(A, rank, n_oversamples=None, n_subspace_iters=None, return_range=False)
 def find_range(A, n_samples, n_subspace_iters=None):
     """Algorithm 4.1: Randomized range finder (p. 240 of Halko et al).
 
-    Given an  A, and an sampling parameter l, compute an (m x l)
-    orthonormal matrix Q which is an approximate basis for the range of A.
+    Given a matrix A and a number of samples, computes an orthonormal matrix
+    that approximates the range of A.
 
     :param A:                (m x n) matrix.
     :param n_samples:        Number of Gaussian random samples.
@@ -68,6 +68,9 @@ def find_range(A, n_samples, n_subspace_iters=None):
 def subspace_iter(A, Y0, n_iters):
     """Algorithm 4.4: Randomized subspace iteration (p. 244 of Halko et al).
 
+    Computes a numerically stable and accurate subspace iteration an approximate
+    range of A, Y0.
+
     :param A:       (m x n) matrix.
     :param Y0:      Initial approximate range of A.
     :param n_iters: Number of subspace iterations.
@@ -84,6 +87,8 @@ def subspace_iter(A, Y0, n_iters):
 
 def ortho_basis(M):
     """
+    Computes an orthonormal basis for a matrix.
+
     :param M: (m x n) matrix.
     :return:  An orthonormal basis for M.
     """
