@@ -48,15 +48,15 @@ if __name__ == '__main__':
         min_ = S[l + 1]
         mins.append(np.log10(min_))
 
-    ax.scatter(ls, mins, color='#11accd', s=20,
-               label=r'$\log_{10}(\sigma_{k+1})$', marker='v')
-    ax.scatter(ls, errs, color='#807504', s=20, label=r'$\log_{10}(e_l)$',
+    ax.scatter(ls, mins, color='#11accd', s=30,
+               label=r'$\log_{10}(\sigma_{\ell+1})$', marker='v')
+    ax.scatter(ls, errs, color='#807504', s=30, label=r'$\log_{10}(e_{\ell})$',
                marker='o')
     ax.plot(ls, mins, color='#11accd', linewidth=1)
     ax.plot(ls, errs, color='#807504', linewidth=1)
 
     ax.set_ylabel('Order of magnitude of errors')
-    ax.set_xlabel(r'$l$')
+    ax.set_xlabel(r'Random samples $\ell$')
     ax.set_title('Exponentially decaying singular values')
 
     plt.legend()

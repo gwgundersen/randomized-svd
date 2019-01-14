@@ -34,15 +34,18 @@ if __name__ == '__main__':
     S_true = [s / S_true.max() for s in S_true]
     x = range(len(S_true))
     ax.scatter(x, S_true, color='gray')
-    ax.plot(x, S_true, label='True singular values', color='gray')
+    ax.plot(x, S_true, label='True singular values', color='gray', marker='s')
 
-    for q, color in [(1, '#11accd'), (2, '#807504'), (3, '#bc2612')]:
+    qs = [(1, '#11accd', '*'), (2, '#807504', 'v'), (3, '#bc2612', 'd')]
+    for q, color, marker in qs:
         A_new = (A @ A.T) ** q @ A
         S = np.linalg.svd(A_new, compute_uv=False)
         S_new = [s / S.max() for s in S]
         ax.scatter(x, S_new, color=color)
-        ax.plot(x, S_new, label=r'$q = %s$' % q, color=color)
+        ax.plot(x, S_new, label=r'$q = %s$' % q, color=color, marker=marker)
 
+    ax.set_ylabel('Normalized magnitude')
+    ax.set_xlabel(r'Singular values $\sigma_i$')
     ax.set_title('Normalized singular values per $q$ power iterations')
     plt.legend()
     plt.tight_layout()
