@@ -1,4 +1,4 @@
-### Randomized SVD
+## Randomized SVD
 
 This repository contains a Python 3.X implementation of randomized SVD as described in
 
