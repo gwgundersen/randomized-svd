@@ -1,77 +1,91 @@
 """=============================================================================
-Randomized SVD.
+Randomized SVD. See Halko, Martinsson, Tropp's 2011 SIAM paper:
 
-See:
-
-    "Finding structure with randomness: Probabilistic algorithms for constructing
-    approximate matrix decompositions"
-
-    by Halko, Martinsson, Tropp, SIAM 2011
+"Finding structure with randomness: Probabilistic algorithms for constructing
+approximate matrix decompositions"
 ============================================================================="""
 
 import numpy as np
 
 # ------------------------------------------------------------------------------
 
-mm  = np.matmul
+def rsvd(A, rank, n_oversamples=None, n_subspace_iters=None, return_range=False):
+    """Randomized SVD (p. 227 of Halko et al).
+
+    :param A:                (m x n) matrix.
+    :param rank:             Desired rank approximation.
+    :param n_oversamples:    Oversampling parameter for Gaussian random samples.
+    :param n_subspace_iters: Number of power iterations.
+    :param return_range:     If `True`, return basis for approximate range of A.
+    :return:                 U, S, and Vt as in truncated SVD.
+    """
+    if n_oversamples is None:
+        # This is the default in the presented algorithm.
+        n_samples = 2 * rank
+    else:
+        n_samples = rank + n_oversamples
+
+    # Stage A.
+    Q = find_range(A, n_samples, n_subspace_iters)
+
+    # Stage B.
+    B = Q.T @ A
+    U_tilde, S, Vt = np.linalg.svd(B)
+    U = Q @ U_tilde
+
+    # Truncate.
+    U, S, Vt = U[:, :rank], S[:rank], Vt[:rank, :]
+
+    # This is useful for computing the actual error of our approximation.
+    if return_range:
+        return U, S, Vt, Q
+    return U, S, Vt
 
 # ------------------------------------------------------------------------------
 
-def find_Q(A, l):
-    """Algorithm 4.1: Randomized range finder.
+def find_range(A, n_samples, n_subspace_iters=None):
+    """Algorithm 4.1: Randomized range finder (p. 240 of Halko et al).
 
-    Given an m × n matrix A, and an integer l, compute an m × l orthonormal
-    matrix Q whose range approximates the range of A.
+    Given an  A, and an sampling parameter l, compute an (m x l)
+    orthonormal matrix Q which is an approximate basis for the range of A.
+
+    :param A:                (m x n) matrix.
+    :param n_samples:        Number of Gaussian random samples.
+    :param n_subspace_iters: Number of subspace iterations.
+    :return:                 Orthonormal basis for approximate range of A.
     """
-    # Step 1. Draw an n × l Gaussian random matrix O.
     m, n = A.shape
-    Ω = np.random.randn(n, l)
+    O = np.random.randn(n, n_samples)
+    Y = A @ O
 
-    # Step 2. Form the m × l matrix Y = AΩ.
-    Y = mm(A, Ω)
-    Y = normalize_columns(Y)
+    if n_subspace_iters:
+        return subspace_iter(A, Y, n_subspace_iters)
+    else:
+        return ortho_basis(Y)
 
-    # Step 3. Construct an m × l matrix Q whose columns are an orthonormal
-    #         basis for the range of Y, e.g. using the QR factorization Y = QR.
-    Q, R = np.linalg.qr(Y, mode='reduced')
+# ------------------------------------------------------------------------------
+
+def subspace_iter(A, Y0, n_iters):
+    """Algorithm 4.4: Randomized subspace iteration (p. 244 of Halko et al).
+
+    :param A:       (m x n) matrix.
+    :param Y0:      Initial approximate range of A.
+    :param n_iters: Number of subspace iterations.
+    :return:        Orthonormalized approximate range of A after power
+                    iterations.
+    """
+    Q = ortho_basis(Y0)
+    for _ in range(n_iters):
+        Z = ortho_basis(A.T @ Q)
+        Q = ortho_basis(A @ Z)
     return Q
 
 # ------------------------------------------------------------------------------
 
-def rsvd(A, k, l=None, return_Q=False):
-    """Given an m × n matrix A, a target number k of singular vectors, and
-    (optionally) a number to oversample l, this procedure computes an
-    approximate rank-2k factorization UΣVt, where U and V are orthonormal
-    and Σ is nonnegative and diagonal.
+def ortho_basis(M):
     """
-    if l is None:
-        l = 2*k
-    # Stage A.
-    Q = find_Q(A, l)
-
-    # Stage B.
-    B = mm(Q.T, A)
-    S, Σ, Vt = np.linalg.svd(B)
-    U = mm(Q, S)
-
-    # This is useful for computing the actual error of our approximation.
-    if return_Q:
-        return U[:, :k], Σ[:k], Vt[:k, :], Q
-    return U[:, :k], Σ[:k], Vt[:k, :]
-
-# ------------------------------------------------------------------------------
-
-def normalize_columns(X):
+    :param M: (m x n) matrix.
+    :return:  An orthonormal basis for M.
     """
-    :return: X with each column normalized.
-    Example
-    -------
-    >>> X = np.array([[1000,  10,   0.5],
-                     [ 765,   5,  0.35],
-                     [ 800,   7,  0.09]])
-    >>> normalize_columns(X)
-    [[ 1.     1.     1.   ]
-     [ 0.765  0.5    0.7  ]
-     [ 0.8    0.7    0.18 ]]
-    """
-    return X / X.max(axis=0)
+    Q, _ = np.linalg.qr(M)
+    return Q
