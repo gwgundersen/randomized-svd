@@ -5,7 +5,11 @@ This repository contains a Python 3.X implementation of randomized SVD as descri
 > [_Finding structure with randomness: Probabilistic algorithms for constructing approximate matrix decompositions_](https://arxiv.org/abs/0909.4061) by
 Nathan Halko, Per-Gunnar Martinsson, Joel A. Tropp (2010).
 
-Furthermore, the repository contains a script for reproducing numerical results from Figure 7.2 in the paper, demonstrating that the implementation produces an actual error that is close to the theoretical minimum implied by Theorem 1.1 in the paper.
+Furthermore, the repository contains several scripts:
+ 
+- `gen_fig72.py`: This script reproduces the numerical results from Figure 7.2 in the paper, demonstrating that the implementation produces an actual error that is close to the theoretical minimum implied by Theorem 1.1 in the paper.
+- `recon_images.py`: This script uses randomized SVD to reconstruct a photograph and demonstrates qualitatively that randomized SVD is working as expected.
+- `gen_subspace_fig.py`: This script 
 
 ### Installation and Usage
 

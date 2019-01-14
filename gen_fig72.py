@@ -1,7 +1,8 @@
 """=============================================================================
-Reproducing numerical results in Halko et al's Figure 7.2.
-
-Randomized SVD on a matrix with rapidly decaying singular values.
+Reproducing numerical results in Halko et al's Figure 7.2. The main idea is to
+demonstrate that on a matrix with rapidly decaying singular values, randomized
+SVD captures low-rank structure with a reconstruction loss that is close to the
+theoretical minimum.
 ============================================================================="""
 
 import matplotlib.pyplot as plt
@@ -9,9 +10,11 @@ from   matplotlib import rc
 import numpy as np
 from   rsvd import rsvd
 
-# ------------------------------------------------------------------------------
-
-rc('font', **{'family': 'sans-serif', 'sans-serif': ['Arial']})
+rc('font', **{
+    'family': 'sans-serif',
+    'sans-serif': 'Arial',
+    'size' : 16
+})
 rc('text', usetex=True)
 
 # ------------------------------------------------------------------------------
@@ -34,7 +37,6 @@ if __name__ == '__main__':
 
     mins = []
     errs = []
-    rank = 1e100000
 
     ls = range(1, 151, 5)
     for l in ls:
@@ -42,7 +44,7 @@ if __name__ == '__main__':
         err = np.linalg.norm((np.eye(m) - Q @ Q.T) @ A, 2)
         errs.append(np.log10(err))
 
-        _, S, _ = np.linalg.svd(A)
+        S = np.linalg.svd(A, compute_uv=False)
         min_ = S[l + 1]
         mins.append(np.log10(min_))
 
