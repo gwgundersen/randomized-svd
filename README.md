@@ -12,11 +12,13 @@ Furthermore, the repository contains a script for reproducing numerical results 
 To install and reproduce the figures, first clone the repository and then run:
 
 ```bash
-conda create -n rsvd python=3.7 -f=requirements.txt
+$ cd /path/to/repo
+$ conda create -n rsvd python=3.7 -f=requirements.txt
+$ source activate rsvd
 ```
 
-To generate Figure 7.2, run:
+Then just run the scripts, e.g.:
 
 ```bash
-python gen_fig72.py
+$ python gen_fig72.py
 ```
