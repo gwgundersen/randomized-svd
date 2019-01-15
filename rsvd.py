@@ -9,7 +9,8 @@ import numpy as np
 
 # ------------------------------------------------------------------------------
 
-def rsvd(A, rank, n_oversamples=None, n_subspace_iters=None, return_range=False):
+def rsvd(A, rank, n_oversamples=None, n_subspace_iters=None,
+         return_range=False):
     """Randomized SVD (p. 227 of Halko et al).
 
     :param A:                (m x n) matrix.
@@ -68,8 +69,8 @@ def find_range(A, n_samples, n_subspace_iters=None):
 def subspace_iter(A, Y0, n_iters):
     """Algorithm 4.4: Randomized subspace iteration (p. 244 of Halko et al).
 
-    Computes a numerically stable and accurate subspace iteration an approximate
-    range of A, Y0.
+    Uses a numerically stable subspace iteration algorithm to down-weight
+    smaller singular values.
 
     :param A:       (m x n) matrix.
     :param Y0:      Initial approximate range of A.
@@ -86,8 +87,7 @@ def subspace_iter(A, Y0, n_iters):
 # ------------------------------------------------------------------------------
 
 def ortho_basis(M):
-    """
-    Computes an orthonormal basis for a matrix.
+    """Computes an orthonormal basis for a matrix.
 
     :param M: (m x n) matrix.
     :return:  An orthonormal basis for M.
